@@ -1,0 +1,30 @@
+# Virtual Environment
+venv/
+ENV/
+.venv/
+bin/
+lib/
+share/
+pyvenv.cfg
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment Variables (SENSITIVE)
+.env
+
+# Project Specific
+sample6.pdf
+results.json
+results.xlsx
+test_results.xlsx
+optimized_results.xlsx
+all_results.json
+test_dir/
+
+# macOS
+.DS_Store
