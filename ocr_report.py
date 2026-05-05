@@ -16,7 +16,7 @@ except ImportError:
 # Load environment variables
 load_dotenv()
 
-def run_single_ocr(image_path):
+def run_single_ocr(image_path, model_name):
   """
   Wrapper to run a single OCR task using the shared batch logic.
   """
@@ -32,11 +32,12 @@ def run_single_ocr(image_path):
     print(f"Error: File not found at {image_path}")
     return
 
-  print(f"Processing single file: {image_path}...")
+  print(f"Processing single file: {image_path} using model: {model_name}...")
 
   try:
     img = Image.open(image_path)
-    result = extract_data_from_image(client, img, image_path)
+    result = extract_data_from_image(client, img, image_path,
+                                   model_name=model_name)
 
     if result:
       print("\n--- Extraction Results ---")
@@ -48,7 +49,14 @@ def run_single_ocr(image_path):
     print(f"Error: {e}")
 
 if __name__ == "__main__":
-  if len(sys.argv) < 2:
-    print("Usage: python ocr_report.py <image_path>")
-  else:
-    run_single_ocr(sys.argv[1])
+  import argparse
+
+  parser = argparse.ArgumentParser(description="Single-file OCR test.")
+  parser.add_argument("image_path", help="Path to the image file.")
+  parser.add_argument("--lite", action="store_true",
+                      help="Use the gemini-flash-lite-latest model.")
+
+  args = parser.parse_args()
+
+  model = "gemini-flash-lite-latest" if args.lite else "gemini-flash-latest"
+  run_single_ocr(args.image_path, model)

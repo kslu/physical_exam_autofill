@@ -144,7 +144,7 @@ def extract_data_from_image(client, img_obj, filename_ctx,
         break
   return None
 
-def process_directory(input_dir, output_file):
+def process_directory(input_dir, output_file, model_name):
   api_key = os.getenv('GOOGLE_API_KEY')
   if not api_key:
     print("Error: GOOGLE_API_KEY not found.")
@@ -161,7 +161,7 @@ def process_directory(input_dir, output_file):
     print(f"No supported files found in {input_dir}")
     return
 
-  print(f"Found {len(files)} files in {input_dir}.")
+  print(f"Found {len(files)} files in {input_dir}. Using model: {model_name}")
 
   for filename in files:
     file_path = os.path.join(input_dir, filename)
@@ -173,7 +173,8 @@ def process_directory(input_dir, output_file):
         print(f"  [PDF] Detected {len(pages)} pages.")
         for i, page in enumerate(pages):
           print(f"    Extracting Page {i+1}...")
-          data = extract_data_from_image(client, page, f"{filename}_p{i+1}")
+          data = extract_data_from_image(client, page, f"{filename}_p{i+1}",
+                                       model_name=model_name)
           if data:
             data['Source_File'] = f"{filename}_page_{i+1}"
             all_data.append(data)
@@ -183,7 +184,8 @@ def process_directory(input_dir, output_file):
     else:
       try:
         img = Image.open(file_path)
-        data = extract_data_from_image(client, img, filename)
+        data = extract_data_from_image(client, img, filename,
+                                     model_name=model_name)
         if data:
           data['Source_File'] = filename
           all_data.append(data)
@@ -230,14 +232,17 @@ def process_directory(input_dir, output_file):
       print(f"\nBatch complete! Saved to: {output_file}")
 
 if __name__ == "__main__":
-  if len(sys.argv) < 2:
-    print("Usage: python batch_ocr.py <input_directory> [output_file]")
-    sys.exit(1)
+  import argparse
+  parser = argparse.ArgumentParser(description="Batch OCR reports.")
+  parser.add_argument("input_directory", help="Dir with images or PDFs.")
+  parser.add_argument("output_file", nargs="?", default="results.xlsx",
+                      help="Output file path (default: results.xlsx).")
+  parser.add_argument("--lite", action="store_true", help="Use flash-lite.")
+  args = parser.parse_args()
 
-  input_directory = sys.argv[1]
-  output_file = sys.argv[2] if len(sys.argv) > 2 else "results.xlsx"
+  model = "gemini-flash-lite-latest" if args.lite else "gemini-flash-latest"
 
-  if not os.path.isdir(input_directory):
-    print(f"Error: {input_directory} is not a directory.")
+  if not os.path.isdir(args.input_directory):
+    print(f"Error: {args.input_directory} is not a directory.")
   else:
-    process_directory(input_directory, output_file)
+    process_directory(args.input_directory, args.output_file, model)

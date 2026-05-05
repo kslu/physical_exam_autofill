@@ -36,14 +36,19 @@ Process an entire folder of images and save the results directly to an Excel fil
 ```bash
 python batch_ocr.py input_folder output_results.xlsx
 ```
-- **Automatic Quota Handling**: This script automatically catches `RESOURCE_EXHAUSTED` (429) errors, waits for the limit to reset, and retries.
-- **Excel Output**: Generates a spreadsheet with headers matching the New Taipei City health report format.
+- **Optional**: Add `--lite` to use the `gemini-flash-lite-latest` model to save
+  on daily quota.
+- **Automatic Quota Handling**: This script automatically catches
+  `RESOURCE_EXHAUSTED` (429) errors, waits for the limit to reset, and retries.
+- **Excel Output**: Generates a spreadsheet with headers matching the New
+  Taipei City health report format.
 
 ### Single File Quick Test
 Extract data from one image and print it to the terminal:
 ```bash
 python ocr_report.py sample.jpeg
 ```
+- **Optional**: Add `--lite` to use the lite model.
 
 ## Features
 - **Excel Integration**: Direct output to `.xlsx` using pandas.
