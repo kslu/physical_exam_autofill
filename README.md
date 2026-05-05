@@ -1,6 +1,8 @@
 # Physical Exam OCR Extraction Script
 
-**New to software?** Check out our [BEGINNER_GUIDE.md](./BEGINNER_GUIDE.md) for a step-by-step tutorial on setting everything up on your Mac.
+**New to software?** Check out our setup guides:
+- [BEGINNER_GUIDE.md (Mac Users)](./BEGINNER_GUIDE.md)
+- [WINDOWS_GUIDE.md (Windows Users)](./WINDOWS_GUIDE.md)
 
 ---
 
