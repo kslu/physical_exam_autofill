@@ -36,8 +36,9 @@ Process an entire folder of images and save the results directly to an Excel fil
 ```bash
 python batch_ocr.py input_folder output_results.xlsx
 ```
-- **Optional**: Add `--lite` to use the `gemini-flash-lite-latest` model to save
-  on daily quota.
+- **Optional**: Add `--lite` to use the `gemini-flash-lite-latest` model.
+- **Optional**: Add `--retries 20` to increase the number of attempts for quota
+  limits (default is 10).
 - **Automatic Quota Handling**: This script automatically catches
   `RESOURCE_EXHAUSTED` (429) errors, waits for the limit to reset, and retries.
 - **Excel Output**: Generates a spreadsheet with headers matching the New

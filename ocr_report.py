@@ -16,7 +16,7 @@ except ImportError:
 # Load environment variables
 load_dotenv()
 
-def run_single_ocr(image_path, model_name):
+def run_single_ocr(image_path, model_name, max_retries):
   """
   Wrapper to run a single OCR task using the shared batch logic.
   """
@@ -37,7 +37,8 @@ def run_single_ocr(image_path, model_name):
   try:
     img = Image.open(image_path)
     result = extract_data_from_image(client, img, image_path,
-                                   model_name=model_name)
+                                   model_name=model_name,
+                                   max_retries=max_retries)
 
     if result:
       print("\n--- Extraction Results ---")
@@ -55,8 +56,10 @@ if __name__ == "__main__":
   parser.add_argument("image_path", help="Path to the image file.")
   parser.add_argument("--lite", action="store_true",
                       help="Use the gemini-flash-lite-latest model.")
+  parser.add_argument("--retries", type=int, default=5,
+                      help="Number of retries for quota limits (default: 5).")
 
   args = parser.parse_args()
 
   model = "gemini-flash-lite-latest" if args.lite else "gemini-flash-latest"
-  run_single_ocr(args.image_path, model)
+  run_single_ocr(args.image_path, model, args.retries)

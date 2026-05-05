@@ -86,7 +86,8 @@ def get_extraction_schema():
   }
 
 def extract_data_from_image(client, img_obj, filename_ctx,
-                           model_name='gemini-flash-latest'):
+                           model_name='gemini-flash-latest',
+                           max_retries=10):
   """
   Extracts data from an image object using structured output and lookups.
   """
@@ -122,9 +123,7 @@ def extract_data_from_image(client, img_obj, filename_ctx,
     response_schema=get_extraction_schema()
   )
 
-  max_retries = 5
   wait_time = 30
-
   for attempt in range(max_retries):
     try:
       response = client.models.generate_content(
@@ -136,7 +135,7 @@ def extract_data_from_image(client, img_obj, filename_ctx,
     except Exception as e:
       if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
         print(f"  [Quota] Limit reached for {filename_ctx}. "
-              f"Waiting {wait_time}s...")
+              f"Waiting {wait_time}s (Attempt {attempt+1}/{max_retries})...")
         time.sleep(wait_time)
         wait_time *= 2
       else:
@@ -144,7 +143,7 @@ def extract_data_from_image(client, img_obj, filename_ctx,
         break
   return None
 
-def process_directory(input_dir, output_file, model_name):
+def process_directory(input_dir, output_file, model_name, max_retries):
   api_key = os.getenv('GOOGLE_API_KEY')
   if not api_key:
     print("Error: GOOGLE_API_KEY not found.")
@@ -174,7 +173,8 @@ def process_directory(input_dir, output_file, model_name):
         for i, page in enumerate(pages):
           print(f"    Extracting Page {i+1}...")
           data = extract_data_from_image(client, page, f"{filename}_p{i+1}",
-                                       model_name=model_name)
+                                       model_name=model_name,
+                                       max_retries=max_retries)
           if data:
             data['Source_File'] = f"{filename}_page_{i+1}"
             all_data.append(data)
@@ -185,7 +185,8 @@ def process_directory(input_dir, output_file, model_name):
       try:
         img = Image.open(file_path)
         data = extract_data_from_image(client, img, filename,
-                                     model_name=model_name)
+                                     model_name=model_name,
+                                     max_retries=max_retries)
         if data:
           data['Source_File'] = filename
           all_data.append(data)
@@ -238,6 +239,8 @@ if __name__ == "__main__":
   parser.add_argument("output_file", nargs="?", default="results.xlsx",
                       help="Output file path (default: results.xlsx).")
   parser.add_argument("--lite", action="store_true", help="Use flash-lite.")
+  parser.add_argument("--retries", type=int, default=5,
+                      help="Number of retries for quota limits (default: 5).")
   args = parser.parse_args()
 
   model = "gemini-flash-lite-latest" if args.lite else "gemini-flash-latest"
@@ -245,4 +248,5 @@ if __name__ == "__main__":
   if not os.path.isdir(args.input_directory):
     print(f"Error: {args.input_directory} is not a directory.")
   else:
-    process_directory(args.input_directory, args.output_file, model)
+    process_directory(args.input_directory, args.output_file, model,
+                      args.retries)
