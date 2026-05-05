@@ -56,36 +56,42 @@ This creates a clean workspace for the project.
 ---
 
 ## Step 5: Install Requirements
-Type this command to install the necessary libraries:
+Type this command to install the necessary libraries, including the new UI:
 ```powershell
-pip install google-genai Pillow python-dotenv pandas openpyxl pdf2image
+pip install google-genai Pillow python-dotenv pandas openpyxl pdf2image streamlit
 ```
 
 ---
 
 ## Step 6: Add your API Key
-1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and click
-   **Create API Key**. Copy the key.
-2. Back in your project folder (in Windows Explorer), right-click and create a
-   **New > Text Document**.
-3. Name the file exactly `.env` (make sure there is no `.txt` at the end).
-4. Open it with Notepad and paste:
-   `GOOGLE_API_KEY=your_key_here`
+(Same as before... create a `.env` file)
+
+---
+
+## Step 7: Run with the Graphical UI
+Instead of typing commands, you can now use a beautiful web interface.
+1. In the blue PowerShell window, type:
+   ```powershell
+   streamlit run app.py
+   ```
+2. Your web browser will open automatically.
+3. Drag and drop your images or PDFs into the window.
+4. Click **Start Extraction**.
+5. Once finished, click the **Download Excel Results** button.
+
+---
+
+## Step 8: Automate the Startup (Double-Click Icon)
+To make it easy to start without typing commands every time:
+1. In your project folder, right-click and select **New > Text Document**.
+2. Name it `Run_OCR.bat` (make sure it ends in `.bat`, not `.txt`).
+3. Right-click `Run_OCR.bat` and select **Edit**.
+4. Paste the following text:
+   ```batch
+   @echo off
+   call venv\Scripts\activate
+   streamlit run app.py
+   pause
+   ```
 5. Save and close.
-
----
-
-## Step 7: Run the Tool!
-Put your images in a folder (e.g., `my_scans`) and run:
-```powershell
-python batch_ocr.py my_scans results.xlsx
-```
-Check your folder for a new file named `results.xlsx`!
-
----
-
-## Summary of Daily Use
-Every time you want to use the tool:
-1. Open the folder and type `powershell` in the address bar.
-2. Type: `.\venv\Scripts\Activate.ps1`
-3. Type: `python batch_ocr.py input_folder output.xlsx`
+6. Now, you can just **double-click Run_OCR.bat** to start the program!
